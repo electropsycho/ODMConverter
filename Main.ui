@@ -6,9 +6,27 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>384</width>
-    <height>276</height>
+    <width>400</width>
+    <height>460</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>400</width>
+    <height>460</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>400</width>
+    <height>460</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>ÖDM Dönüştürücü v1.0</string>
@@ -30,6 +48,8 @@
     <property name="font">
      <font>
       <pointsize>9</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
      </font>
     </property>
     <property name="text">
@@ -48,33 +68,42 @@
     <property name="font">
      <font>
       <pointsize>9</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
      </font>
     </property>
     <property name="text">
-     <string>Cevap
-TXTveya DAT
- Seç</string>
+     <string>Cevaplar
+Dosyasını
+Seç</string>
     </property>
    </widget>
    <widget class="QGroupBox" name="groupBox">
     <property name="geometry">
      <rect>
       <x>250</x>
-      <y>20</y>
-      <width>121</width>
-      <height>151</height>
+      <y>10</y>
+      <width>141</width>
+      <height>161</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>9</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
     </property>
     <property name="title">
      <string>Dersler</string>
     </property>
-    <widget class="QWidget" name="">
+    <widget class="QWidget" name="layoutWidget">
      <property name="geometry">
       <rect>
        <x>10</x>
        <y>20</y>
-       <width>101</width>
-       <height>121</height>
+       <width>119</width>
+       <height>131</height>
       </rect>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
@@ -83,6 +112,9 @@ TXTveya DAT
         <property name="text">
          <string>Türkçe</string>
         </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
        </widget>
       </item>
       <item>
@@ -90,12 +122,18 @@ TXTveya DAT
         <property name="text">
          <string>Matematik</string>
         </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
        </widget>
       </item>
       <item>
        <widget class="QCheckBox" name="cbFen">
         <property name="text">
          <string>Fen Bilimler</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
@@ -111,6 +149,13 @@ TXTveya DAT
       <height>71</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <pointsize>9</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
     <property name="text">
      <string>Cevap Şablonunu Ayarla</string>
     </property>
@@ -120,7 +165,7 @@ TXTveya DAT
      <rect>
       <x>10</x>
       <y>180</y>
-      <width>361</width>
+      <width>381</width>
       <height>81</height>
      </rect>
     </property>
@@ -139,7 +184,7 @@ TXTveya DAT
     border-width: 2px;
     border-radius: 10px;
     border-color: black;
-    font: bold 14px;
+    font: bold 16px;
     min-width: 10em;
     padding: 6px;
 }
@@ -153,8 +198,71 @@ QPushButton:pressed {
      <string>E-Okula Yüklenecek Dosyaları Hazırla</string>
     </property>
    </widget>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>270</y>
+      <width>111</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>9</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
+      <underline>false</underline>
+      <kerning>true</kerning>
+     </font>
+    </property>
+    <property name="text">
+     <string>Hatalı Kayıtlar</string>
+    </property>
+   </widget>
+   <widget class="QTextEdit" name="teHataliKayitlar">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>290</y>
+      <width>381</width>
+      <height>161</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <weight>75</weight>
+      <italic>true</italic>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::Box</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Plain</enum>
+    </property>
+    <property name="sizeAdjustPolicy">
+     <enum>QAbstractScrollArea::AdjustToContentsOnFirstShow</enum>
+    </property>
+    <property name="autoFormatting">
+     <set>QTextEdit::AutoBulletList</set>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>pbKutuk</tabstop>
+  <tabstop>pbCevap</tabstop>
+  <tabstop>pbSablon</tabstop>
+  <tabstop>cbTurkce</tabstop>
+  <tabstop>cbMat</tabstop>
+  <tabstop>cbFen</tabstop>
+  <tabstop>pbHazirla</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
