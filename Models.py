@@ -49,8 +49,10 @@ class Cevap(object):
     adSoyad = None
     okulAdi = None
     ilceAdi = None
+    sube = None
 
     def __init__(self, opak=None,
+                 ogrenciNo = None,
                  katilimDurumu=None,
                  kitapcikTuru=None,
                  turkceCevaplar=None,
@@ -63,6 +65,7 @@ class Cevap(object):
         self.fenCevaplar = fenCevaplar
         self.sinavKodu = sinavKodu
         self.kitapcikTuru = kitapcikTuru
+        self.ogrenciNo =  0 if ogrenciNo is None else int(ogrenciNo)
         self.katilimDurumu = 0 if katilimDurumu =="1" else 1
 
     def setDersId(self, dersId):
@@ -95,17 +98,22 @@ class Cevap(object):
             formatliCevap = formatliCevap + self.fenCevaplar
         return formatliCevap
 
-    def toSorunluKayit(self):
-        if self.kitapcikTuru is None or self.kitapcikTuru.isspace():
-            return "Kitapçık türü işratelememe hatası, İlçe: " \
-                   + self.ilceAdi + " Okul: " + self.okulAdi \
-                   + " Öğrenci Adı:" + self.adSoyad
-        if self.kurumKodu is None or self.ogrenciNo is None:
-            return "Cevaplar arasında Kurum kodu ve Öğrenci No kodlanmamış kayıt var!"
-
-        return "Hatalı Kayıt, Öğrenci Nakil Olmuş Olabilir." \
-               " Kurum Kodu:" + str(self.kurumKodu) \
-               + " Öğrenci No:" + str(self.ogrenciNo)
+    # def toSorunluKayit(self):
+    #
+    #     if self.kitapcikTuru is None or self.kitapcikTuru.isspace():
+    #        res = "Kitapçık türü işratelememe hatası, İlçe: " \
+    #                + self.ilceAdi + " Okul: " + self.okulAdi \
+    #                + " Öğrenci Adı:" + self.adSoyad \
+    #                + " Şube: " + self.sube\
+    #                +" Ögrenci No:" + str(self.ogrenciNo)
+    #        return res
+    #
+    #     if self.kurumKodu is None or self.ogrenciNo is None:
+    #         return "Cevaplar arasında Kurum kodu ve Öğrenci No kodlanmamış kayıt var!"
+    #
+    #     return "Hatalı Kayıt, Öğrenci Nakil Olmuş Olabilir." \
+    #            " Kurum Kodu:" + str(self.kurumKodu) \
+    #            + " Öğrenci No:" + str(self.ogrenciNo)
 
     def __str__(self):
         return "Opak:" + str(self.opak) \

@@ -94,10 +94,12 @@ class AnaKontrolcu(object):
             self.ekraniKilitleAc(False)
             #Sınf bilgisi kütükten alınıyor
             sinif = self.sinifBilgisiBul(wsKutuk=self.wsKutuk)
+            cevapSatirSayisi = 0
 
             """Dosya acma ve okuma işlemleri Ayar sınıfınıniçeriğine göre buradan itibaren yapılıyor"""
             with open(self.cevap_dosyasi_yolu) as cd:
                 for satir in cd:
+                    cevapSatirSayisi = cevapSatirSayisi+1
                     kurumKoduVeyaOpak = satir[
                                         Ayar.kkopak_baslangic_degeri - 1: Ayar.kkopak_karakter_sayisi + Ayar.kkopak_baslangic_degeri - 1]
 
@@ -112,52 +114,71 @@ class AnaKontrolcu(object):
                     katilimDurumu = satir[Ayar.katilma_durumu_baslangic - 1:Ayar.katilma_durumu_baslangic]
                     kitapcik = satir[Ayar.kitapcik_turu_baslangic - 1:Ayar.kitapcik_turu_baslangic]
 
-                    """Cevap kağıtlarında kurum kodu ve öğrenci no kullanıldı ise işler azıcık karışık çok minicik"""
-                    if Ayar.kurum_kodu_kullanimi:
-                        if not kurumKoduVeyaOpak.isspace() and not ogrenci_no.isspace():
-                            sonuc = self.kutuktenKurumKoduVeOgrenciNoIleBul(self.wsKutuk, int(ogrenci_no), int(kurumKoduVeyaOpak))
-                            c = Cevap(opak=sonuc[0],
+                    if len(satir.strip()) >= 5:
+                        """Cevap kağıtlarında kurum kodu ve öğrenci no kullanıldı ise işler azıcık karışık çok minicik"""
+                        if Ayar.kurum_kodu_kullanimi:
+                            if not kurumKoduVeyaOpak.isspace() and not ogrenci_no.isspace():
+                                sonuc = self.kutuktenKurumKoduVeOgrenciNoIleBul(self.wsKutuk, int(ogrenci_no), int(kurumKoduVeyaOpak))
+                                c = Cevap(opak=sonuc[0],
+                                          ogrenciNo = ogrenci_no,
+                                          katilimDurumu=katilimDurumu,
+                                          kitapcikTuru=kitapcik,
+                                          sinavKodu=sonuc[1],
+                                          turkceCevaplar=turkce_cevaplari,
+                                          fenCevaplar=fen_cevaplari,
+                                          matematikCevaplar=mat_cevaplari)
+                                # Opak bulunamadı ise hatalı kayıotlara ekleniyor
+                                if sonuc[0] is None:
+                                    # sorunluKayitlar.append(c)
+                                    self.ui.teHataliKayitlar.append("Hata-101: Opak bulunanamadı!\n"
+                                                                    "Cevap Anahtarı Satır:{}\n"
+                                                                    .format(cevapSatirSayisi))
+                                # Öğrenci sınava girmiş ancak kitapçık numarası işaretlememiş ise
+                                elif kitapcik.isspace() and c.katilimDurumu != 0:
+                                    #TODO Burada refaktör yapılacak
+                                    hataliKayitDetay = self.hataliKayitKutuktenBul(self.wsKutuk,int(ogrenci_no),int(kurumKoduVeyaOpak))
+                                    # c.adSoyad = hataliKayitDetay[2]
+                                    # c.okulAdi = hataliKayitDetay[3]
+                                    # c.ilceAdi = hataliKayitDetay[4]
+                                    # c.sube = hataliKayitDetay[5]
+                                    # c.ogrenciNo = ogrenci_no
+                                    # sorunluKayitlar.append(c)
+                                    self.ui.teHataliKayitlar.append("Hata-102: Kitapçık türü işaretlememe hatası!\n"
+                                                                    "İlçe:{} Okul:{} Öğrenci Adı:{} Şube:{}\n"
+                                                                    .format(hataliKayitDetay[4], hataliKayitDetay[3],
+                                                                            hataliKayitDetay[2], hataliKayitDetay[5]))
+                                else:
+                                    cevaplar.append(c)
+                        """Cevap kağıtlarında opak kullanıldı ise işler bu kadar basit"""
+                        if Ayar.opak_kullanimi:
+                            c = Cevap(opak=kurumKoduVeyaOpak,
                                       katilimDurumu=katilimDurumu,
                                       kitapcikTuru=kitapcik,
-                                      sinavKodu=sonuc[1],
+                                      sinavKodu=self.kutuktenSinavKoduBul(self.wsKutuk),
                                       turkceCevaplar=turkce_cevaplari,
                                       fenCevaplar=fen_cevaplari,
                                       matematikCevaplar=mat_cevaplari)
-                            # Opak bulunamadı ise hatalı kayıotlara ekleniyor
-                            if sonuc[0] is None:
-                                sorunluKayitlar.append(c)
-                            # Öğrenci sınava girmiş ancak kitapçık numarası işaretlememiş ise
+                            #Opak bulunamadı ise hatalı kayıotlara ekleniyor
+                            if c.opak == 0:
+                                # sorunluKayitlar.append(c)
+                                self.ui.teHataliKayitlar.append("Hata-101: Opak bulunanamadı!\n"
+                                                                "Cevap Anahtarı Satır:{}\n"
+                                                                .format(cevapSatirSayisi))
+
+                            #Öğrenci sınava girmiş ancak kitapçık numarası işaretlememiş ise
                             elif kitapcik.isspace() and c.katilimDurumu != 0:
-                                #TODO Burada refaktör yapılacak
-                                hataliKayitDetay = self.hataliKayitKutuktenBul(self.wsKutuk,int(ogrenci_no),int(kurumKoduVeyaOpak))
-                                c.adSoyad = hataliKayitDetay[2]
-                                c.okulAdi = hataliKayitDetay[3]
-                                c.ilceAdi = hataliKayitDetay[4]
-                                sorunluKayitlar.append(c)
+                                hataliKayitDetay = self.hataliKayitKutuktenBul(self.wsKutuk, opaq=c.opak)
+                                # sorunluKayitlar.append(c)
+                                self.ui.teHataliKayitlar.append("Hata-102: Kitapçık türü işaretlememe hatası!\n"
+                                                                "İlçe:{} Okul:{} Öğrenci Adı:{} Şube:{}\n"
+                                                                .format(hataliKayitDetay[4], hataliKayitDetay[3],
+                                                                        hataliKayitDetay[2], hataliKayitDetay[5]))
                             else:
                                 cevaplar.append(c)
-                    """Cevap kağıtlarında opak kullanıldı ise işler bu kadar basit"""
-                    if Ayar.opak_kullanimi:
-                        c = Cevap(opak=kurumKoduVeyaOpak,
-                                  katilimDurumu=katilimDurumu,
-                                  kitapcikTuru=kitapcik,
-                                  sinavKodu=self.kutuktenSinavKoduBul(self.wsKutuk),
-                                  turkceCevaplar=turkce_cevaplari,
-                                  fenCevaplar=fen_cevaplari,
-                                  matematikCevaplar=mat_cevaplari)
-                        #Opak bulunamadı ise hatalı kayıotlara ekleniyor
-                        if c.opak == 0:
-                            sorunluKayitlar.append(c)
-
-                        #Öğrenci sınava girmiş ancak kitapçık numarası işaretlememiş ise
-                        elif kitapcik.isspace() and c.katilimDurumu != 0:
-                            hataliKayitDetay = self.hataliKayitKutuktenBul(self.wsKutuk, opaq=c.opak)
-                            c.adSoyad = hataliKayitDetay[2]
-                            c.okulAdi = hataliKayitDetay[3]
-                            c.ilceAdi = hataliKayitDetay[4]
-                            sorunluKayitlar.append(c)
-                        else:
-                            cevaplar.append(c)
+                    else:
+                        self.ui.teHataliKayitlar.append("Hata-103: Boş Satır Bulundu!\n"
+                                                        "Cevap Anahtarı Satır:{}\n"
+                                                        .format(cevapSatirSayisi))
 
             """Okuma için açık dosyaları işin bitince mutlaka kapat"""
             cd.close()
@@ -187,8 +208,8 @@ class AnaKontrolcu(object):
                 f.close()
 
 
-        for sk in sorunluKayitlar:
-            self.ui.teHataliKayitlar.append(sk.toSorunluKayit()+"\n")
+        # for sk in sorunluKayitlar:
+        #    pass
         self.ui.teHataliKayitlar.append("Oluşturma işlemleri tamamlandı.")
         self.ekraniKilitleAc(True)
 
@@ -232,20 +253,20 @@ class AnaKontrolcu(object):
         return str(int(wsKutuk.cell(rowx=1, colx=15).value))
 
     def hataliKayitKutuktenBul(self, wsKutuk, ogrenciNo = None, kurumKodu=None, opaq=None):
-        (opak, sinavKodu, adSoyad, okulAdi, ilceAdi) = None, None, None, None, None
+        (opak, sinavKodu, adSoyad, okulAdi, ilceAdi, sube) = None, None, None, None, None, None
         if opak != None:
             for row_num in range(1, wsKutuk.nrows):
                 row_value = wsKutuk.row_values(row_num)
                 if int(row_value[0]) == opaq:
-                    (opak, sinavKodu, adSoyad, okulAdi, ilceAdi) = int(row_value[0]), int(row_value[16]), (row_value[10] + " " + row_value[12]), row_value[6], row_value[3]
+                    (opak, sinavKodu, adSoyad, okulAdi, ilceAdi, sube) = int(row_value[0]), int(row_value[16]), (row_value[10] + " " + row_value[12]), row_value[6], row_value[3], row_value[14]
                     break
         else:
             for row_num in range(1, wsKutuk.nrows):
                 row_value = wsKutuk.row_values(row_num)
                 if int(row_value[4]) == kurumKodu and int(row_value[9]) == ogrenciNo:
-                    (opak, sinavKodu, adSoyad, okulAdi, ilceAdi) = int(row_value[0]), int(row_value[16]), (row_value[10] + " " + row_value[12]), row_value[6], row_value[3]
+                    (opak, sinavKodu, adSoyad, okulAdi, ilceAdi, sube) = int(row_value[0]), int(row_value[16]), (row_value[10] + " " + row_value[12]), row_value[6], row_value[3], row_value[14]
                     break
-        return opak, sinavKodu, adSoyad, okulAdi, ilceAdi
+        return opak, sinavKodu, adSoyad, okulAdi, ilceAdi, sube
 
     def ekraniKilitleAc(self, ac):
         if ac:
