@@ -137,16 +137,12 @@ class AnaKontrolcu(object):
                                 elif kitapcik.isspace() and c.katilimDurumu != 0:
                                     #TODO Burada refaktör yapılacak
                                     hataliKayitDetay = self.hataliKayitKutuktenBul(self.wsKutuk,int(ogrenci_no),int(kurumKoduVeyaOpak))
-                                    # c.adSoyad = hataliKayitDetay[2]
-                                    # c.okulAdi = hataliKayitDetay[3]
-                                    # c.ilceAdi = hataliKayitDetay[4]
-                                    # c.sube = hataliKayitDetay[5]
-                                    # c.ogrenciNo = ogrenci_no
-                                    # sorunluKayitlar.append(c)
                                     self.ui.teHataliKayitlar.append("Hata-102: Kitapçık türü işaretlememe hatası!\n"
-                                                                    "İlçe:{} Okul:{} Öğrenci Adı:{} Şube:{}\n"
+                                                                    "İlçe:{} Okul:{} Öğrenci Adı:{}\n"
+                                                                    "Şube:{} Öğrenci No:{}\n"
                                                                     .format(hataliKayitDetay[4], hataliKayitDetay[3],
-                                                                            hataliKayitDetay[2], hataliKayitDetay[5]))
+                                                                            hataliKayitDetay[2], hataliKayitDetay[5],
+                                                                            ogrenci_no))
                                 else:
                                     cevaplar.append(c)
                         """Cevap kağıtlarında opak kullanıldı ise işler bu kadar basit"""
@@ -162,6 +158,7 @@ class AnaKontrolcu(object):
                             if c.opak == 0:
                                 # sorunluKayitlar.append(c)
                                 self.ui.teHataliKayitlar.append("Hata-101: Opak bulunanamadı!\n"
+                                                                "Kütüğünüzü güncellemiş olabilirsiniz."
                                                                 "Cevap Anahtarı Satır:{}\n"
                                                                 .format(cevapSatirSayisi))
 
@@ -170,9 +167,10 @@ class AnaKontrolcu(object):
                                 hataliKayitDetay = self.hataliKayitKutuktenBul(self.wsKutuk, opaq=c.opak)
                                 # sorunluKayitlar.append(c)
                                 self.ui.teHataliKayitlar.append("Hata-102: Kitapçık türü işaretlememe hatası!\n"
-                                                                "İlçe:{} Okul:{} Öğrenci Adı:{} Şube:{}\n"
+                                                                "İlçe:{} Okul:{} Öğrenci Adı:{}\n"
+                                                                "Şube:{} Öğrenci No:{}\n"
                                                                 .format(hataliKayitDetay[4], hataliKayitDetay[3],
-                                                                        hataliKayitDetay[2], hataliKayitDetay[5]))
+                                                                        hataliKayitDetay[2], hataliKayitDetay[5], ogrenci_no))
                             else:
                                 cevaplar.append(c)
                     else:
