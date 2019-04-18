@@ -1,0 +1,1 @@
+pyinstaller --windowed --noconsole --onefile app.spec

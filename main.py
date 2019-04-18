@@ -9,6 +9,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 from MainController import AnaKontrolcu
+from utils import resource_path
 
 
 class Ui_MainWindow(object):
@@ -23,7 +24,7 @@ class Ui_MainWindow(object):
         MainWindow.setMinimumSize(QtCore.QSize(400, 460))
         MainWindow.setMaximumSize(QtCore.QSize(400, 460))
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("images/filter.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap(resource_path("filter.ico")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         MainWindow.setWindowIcon(icon)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
@@ -80,7 +81,6 @@ class Ui_MainWindow(object):
         self.pbHazirla = QtWidgets.QPushButton(self.centralwidget)
         self.pbHazirla.setGeometry(QtCore.QRect(10, 180, 381, 81))
         font = QtGui.QFont()
-        font.setPointSize(-1)
         font.setBold(True)
         font.setItalic(False)
         font.setWeight(75)

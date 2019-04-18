@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import QFileDialog, QDialog, QMessageBox
 from SettingController import AyarKontrolcu
 from Models import Ayar, Cevap
 from ayar import Ui_Settings
+from utils import resource_path
 
 
 class AnaKontrolcu(object):
@@ -203,7 +204,7 @@ class AnaKontrolcu(object):
     def mesajKutusuGoster(self, baslik, icerik):
         mbox = QMessageBox()
         mbox.setIcon(QMessageBox.Warning)
-        mbox.setWindowIcon(QtGui.QIcon('images/warning.png'))
+        mbox.setWindowIcon(QtGui.QIcon(resource_path('warning.ico')))
         mbox.setWindowTitle(baslik)
         mbox.setText(icerik)
         mbox.setStandardButtons(QMessageBox.Ok)

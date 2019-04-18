@@ -11,6 +11,7 @@ from PyQt5.QtGui import QIntValidator
 from PyQt5.QtWidgets import QDialog
 
 from SettingController import AyarKontrolcu
+from utils import resource_path
 
 
 class Ui_Settings(QDialog):
@@ -25,7 +26,7 @@ class Ui_Settings(QDialog):
         Settings.setMinimumSize(QtCore.QSize(660, 480))
         Settings.setMaximumSize(QtCore.QSize(660, 480))
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("images/settings.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap(resource_path("settings.ico")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         Settings.setWindowIcon(icon)
         Settings.setSizeGripEnabled(False)
         self.groupBox_8 = QtWidgets.QGroupBox(Settings)
