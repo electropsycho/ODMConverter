@@ -156,3 +156,7 @@ class Ui_MainWindow(object):
         self.pbSablon.clicked.connect(AnaKontrolcu.getInstance().sablon_formu_ac)
         self.pbHazirla.clicked.connect(AnaKontrolcu.getInstance().hazirla)
 
+        # self.cbFen.stateChanged.connect(lambda: AnaKontrolcu.getInstance().fenSeciliMi(deger=self.cbFen.isChecked()))
+        # self.cbTurkce.stateChanged.connect(lambda: AnaKontrolcu.getInstance().fenSeciliMi(deger=self.cbTurkce.isChecked()))
+        # self.cbMat.stateChanged.connect(lambda: AnaKontrolcu.getInstance().fenSeciliMi(deger=self.cbMat.isChecked()))
+

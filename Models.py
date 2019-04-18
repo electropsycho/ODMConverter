@@ -63,7 +63,7 @@ class Cevap(object):
         self.fenCevaplar = fenCevaplar
         self.sinavKodu = sinavKodu
         self.kitapcikTuru = kitapcikTuru
-        self.katilimDurumu = 1 if not katilimDurumu else 0
+        self.katilimDurumu = 0 if katilimDurumu =="1" else 1
 
     def setDersId(self, dersId):
         self.dersId = dersId
@@ -99,9 +99,10 @@ class Cevap(object):
         if self.kitapcikTuru is None or self.kitapcikTuru.isspace():
             return "Kitapçık türü işratelememe hatası, İlçe: " \
                    + self.ilceAdi + " Okul: " + self.okulAdi \
-                   + " Öğrenci Adı: " + self.adSoyad
-        elif self.kurumKodu is None or self.ogrenciNo is None:
+                   + " Öğrenci Adı:" + self.adSoyad
+        if self.kurumKodu is None or self.ogrenciNo is None:
             return "Cevaplar arasında Kurum kodu ve Öğrenci No kodlanmamış kayıt var!"
+
         return "Hatalı Kayıt, Öğrenci Nakil Olmuş Olabilir." \
                " Kurum Kodu:" + str(self.kurumKodu) \
                + " Öğrenci No:" + str(self.ogrenciNo)
@@ -111,4 +112,4 @@ class Cevap(object):
                + " Snav Kodu:" + str(self.sinavKodu) \
                + " Türkçe:" + self.turkceCevaplar \
                + " Matematik:" + self.matematikCevaplar \
-               + "Katılım Durumu:" + str(self.katilimDurumu)
+               + " Katılım Durumu:" + str(self.katilimDurumu)

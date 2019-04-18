@@ -17,6 +17,7 @@ class AnaKontrolcu(object):
     cevap_dosyasi = None
     wbKutuk = None
     wsKutuk = None
+    turkceSeciliMi = matematikSeciliMi = fenSeciliMi =True
 
     __instance = None
 
@@ -37,6 +38,7 @@ class AnaKontrolcu(object):
     """Kütük açma işlemini yapan metod. Sadece xls ve xlsx uzantılı dosyalar açılabilir."""
 
     def kutuk_ac(self):
+        self.ekraniKilitleAc(False)
         self.kutuk_yolu, _ = QFileDialog.getOpenFileName(None, "Kütük Seç", "", "Excel Dosyaları (*.xls *.xlsx)")
         """Kütük kontrolü yapılıyor"""
         if self.kutuk_yolu != "":
@@ -48,7 +50,8 @@ class AnaKontrolcu(object):
                                                   "değiştirmeden yazılıma yükleyiniz!")
                 self.wbKutuk.release_resources()  # Burası çok önemli ;-) Kaynakları geri veriyorum RAM a
                 self.kutuk_ac()
-            # wbKutuk.release_resources()
+        self.ekraniKilitleAc(True)
+
 
     """Sekonic ile okunan txt ya da dat dosyasını seçme işlemini yapan metod. Sadece dat ve txt dosyaşarını açabilir."""
 
@@ -86,10 +89,10 @@ class AnaKontrolcu(object):
                                    "Ayarlar yapılmamış!\nTüm seçeneklerin sıfırdan büyük olduğuna emin olunuz.")
             return
         else:
+            #Ekran kilitleniyor
             self.ekraniKilitleAc(False)
-            """Kütük okuması burada yapılıyor"""
-            # wbKutuk = xlrd.open_workbook(self.kutuk_yolu, on_demand=True)
-            # wsKutuk = wbKutuk.sheet_by_index(0)
+            #Sınf bilgisi kütükten alınıyor
+            sinif = self.sinifBilgisiBul(wsKutuk=self.wsKutuk)
 
             """Dosya acma ve okuma işlemleri Ayar sınıfınıniçeriğine göre buradan itibaren yapılıyor"""
             with open(self.cevap_dosyasi_yolu) as cd:
@@ -119,9 +122,11 @@ class AnaKontrolcu(object):
                                       turkceCevaplar=turkce_cevaplari,
                                       fenCevaplar=fen_cevaplari,
                                       matematikCevaplar=mat_cevaplari)
+                            # Opak bulunamadı ise hatalı kayıotlara ekleniyor
                             if sonuc[0] is None:
                                 sorunluKayitlar.append(c)
-                            if kitapcik.isspace():
+                            # Öğrenci sınava girmiş ancak kitapçık numarası işaretlememiş ise
+                            elif kitapcik.isspace() and c.katilimDurumu != 0:
                                 #TODO Burada refaktör yapılacak
                                 hataliKayitDetay = self.hataliKayitKutuktenBul(self.wsKutuk,int(ogrenci_no),int(kurumKoduVeyaOpak))
                                 c.adSoyad = hataliKayitDetay[2]
@@ -135,13 +140,16 @@ class AnaKontrolcu(object):
                         c = Cevap(opak=kurumKoduVeyaOpak,
                                   katilimDurumu=katilimDurumu,
                                   kitapcikTuru=kitapcik,
-                                  sinavKodu=self.kutuktenSınavKoduBul(self.wsKutuk),
+                                  sinavKodu=self.kutuktenSinavKoduBul(self.wsKutuk),
                                   turkceCevaplar=turkce_cevaplari,
                                   fenCevaplar=fen_cevaplari,
                                   matematikCevaplar=mat_cevaplari)
+                        #Opak bulunamadı ise hatalı kayıotlara ekleniyor
                         if c.opak == 0:
                             sorunluKayitlar.append(c)
-                        if kitapcik.isspace():
+
+                        #Öğrenci sınava girmiş ancak kitapçık numarası işaretlememiş ise
+                        elif kitapcik.isspace() and c.katilimDurumu != 0:
                             hataliKayitDetay = self.hataliKayitKutuktenBul(self.wsKutuk, opaq=c.opak)
                             c.adSoyad = hataliKayitDetay[2]
                             c.okulAdi = hataliKayitDetay[3]
@@ -152,14 +160,45 @@ class AnaKontrolcu(object):
 
             """Okuma için açık dosyaları işin bitince mutlaka kapat"""
             cd.close()
+            #Oluşuturulan cevapları dosyaya yazdırma işlemi burada yapılıyor
+            hedefKlasor = QFileDialog.getExistingDirectory(caption="Kayıt yeri seçiniz")
 
-            for c in cevaplar:
-                c.setDersId(1)
-                print(c.toMEBFormat())
-        self.ekraniKilitleAc(True)
+            # MVC tasarım prensibine göre kontrolcü içinden doğrudan ui a erişmek
+            # çok uygun değil ama yine de pratik çözmek için alttaki yaklaşım kullnıldı
+            #Profesyonel tasarımlarda kesinlikle önerilmeyen bir durumdur
+            if self.ui.cbTurkce.isChecked():
+                f = open(hedefKlasor+"/TÜRKÇE-"+ sinif + ".dat", "w+")
+                for cvp in cevaplar:
+                    cvp.setDersId(1)
+                    f.write(cvp.toMEBFormat()+"\n")
+                f.close()
+            if self.ui.cbMat.isChecked():
+                f = open(hedefKlasor + "/MATEMATİK-" + sinif + ".dat", "w+")
+                for cvp in cevaplar:
+                    cvp.setDersId(2)
+                    f.write(cvp.toMEBFormat()+"\n")
+                f.close()
+            if self.ui.cbFen.isChecked():
+                f = open(hedefKlasor + "/FEN-" + sinif + ".dat", "w+")
+                for cvp in cevaplar:
+                    cvp.setDersId(4)
+                    f.write(cvp.toMEBFormat()+"\n")
+                f.close()
+
+
         for sk in sorunluKayitlar:
             self.ui.teHataliKayitlar.append(sk.toSorunluKayit()+"\n")
+        self.ui.teHataliKayitlar.append("Oluşturma işlemleri tamamlandı.")
+        self.ekraniKilitleAc(True)
 
+    def fenSeciliMi(self, deger):
+        self.fenSeciliMi = deger
+
+    def turkceSeciliMi(self, deger):
+        self.turkceSeciliMi = deger
+
+    def matematikSeciliMi(self, deger):
+        self.matematikSeciliMi = deger
 
     def mesajKutusuGoster(self, baslik, icerik):
         mbox = QMessageBox()
@@ -179,14 +218,17 @@ class AnaKontrolcu(object):
                 break
         return (opak, sinavKodu)
 
-    def kutuktenSınavKoduBul(self, wsKutuk):
-        return  wsKutuk.cell(rowx=1, colx=16)
+    def kutuktenSinavKoduBul(self, wsKutuk):
+        return wsKutuk.cell(rowx=1, colx=16).value
         # for row_num in range(1, wsKutuk.nrows):
         #     row_value = wsKutuk.row_values(row_num)
         #     if int(row_value[0]) == opak:
         #         sinavKodu = int(row_value[16])
         #         break
-        # return sinavKodu
+        # return sinavKodu,
+
+    def sinifBilgisiBul(self, wsKutuk):
+        return str(int(wsKutuk.cell(rowx=1, colx=15).value))
 
     def hataliKayitKutuktenBul(self, wsKutuk, ogrenciNo = None, kurumKodu=None, opaq=None):
         (opak, sinavKodu, adSoyad, okulAdi, ilceAdi) = None, None, None, None, None
@@ -194,16 +236,15 @@ class AnaKontrolcu(object):
             for row_num in range(1, wsKutuk.nrows):
                 row_value = wsKutuk.row_values(row_num)
                 if int(row_value[0]) == opaq:
-                    (opak, sinavKodu, adSoyad, okulAdi, ilceAdi) = int(row_value[0]), int(row_value[16]), (row_value[10] + " " + row_value[11]), row_value[6], row_value[3]
+                    (opak, sinavKodu, adSoyad, okulAdi, ilceAdi) = int(row_value[0]), int(row_value[16]), (row_value[10] + " " + row_value[12]), row_value[6], row_value[3]
                     break
         else:
             for row_num in range(1, wsKutuk.nrows):
                 row_value = wsKutuk.row_values(row_num)
                 if int(row_value[4]) == kurumKodu and int(row_value[9]) == ogrenciNo:
-                    (opak, sinavKodu, adSoyad, okulAdi, ilceAdi) = int(row_value[0]), int(row_value[16]), (row_value[10] + " " + row_value[11]), row_value[6], row_value[3]
+                    (opak, sinavKodu, adSoyad, okulAdi, ilceAdi) = int(row_value[0]), int(row_value[16]), (row_value[10] + " " + row_value[12]), row_value[6], row_value[3]
                     break
         return opak, sinavKodu, adSoyad, okulAdi, ilceAdi
-
 
     def ekraniKilitleAc(self, ac):
         if ac:

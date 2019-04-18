@@ -358,12 +358,14 @@ class Ui_Settings(QDialog):
         self.leTurBaslangic.setValidator(dogrulayıcı)
         self.leFenBaslangic.setValidator(dogrulayıcı)
         self.leOgrenciNoBaslangic.setValidator(dogrulayıcı)
+        self.leMatBaslangic.setValidator(dogrulayıcı)
 
         self.leMatKarSayisi.setValidator(dogrulayıcı)
         self.leFenKarSayisi.setValidator(dogrulayıcı)
         self.leTurKarSayisi.setValidator(dogrulayıcı)
         self.leKKOpakKarSayisi.setValidator(dogrulayıcı)
         self.leOgrenciNoKarSayisi.setValidator(dogrulayıcı)
+
 
     def retranslateUi(self, Settings):
         _translate = QtCore.QCoreApplication.translate
